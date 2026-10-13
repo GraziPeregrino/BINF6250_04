@@ -105,8 +105,18 @@ Description of the stumbling blocks the team experienced
 ## Group Leader
 Group leader's reflection on the project
 
-## Other member
-Other members' reflections on the project
+## Other members
+
+### Aamna
+I actually found this project a lot easier to understand conceptually than some of the previous ones, which is surprising because genome assembly in general is a pretty complicated process. Breaking sequencing reads into overlapping k-mers and using those overlaps to build a De Bruijn graph made sense to me. We discussed De Bruijn graphs earlier in the program too which helped because I had a biological application I was already somewhat familiar with so I understood what we were trying to do before getting into the code.
+
+I particularly liked working through the add_edge()/remove_edge() and build_graph_from_reads() functions. Once I understood how each k-mer was split into a prefix and suffix of length k-1, the graph construction clicked and was simple. The toy example helped a lot because I could actually follow how the reads were connected.
+
+The Eulerian walk was probably the most challenging part for me. I understood the idea of traversing every edge exactly once, but recursion took longer to figure out. I had to go through the code a few times to understand why we append nodes after visiting their outgoing edges and why the tour needs to be reversed. I also struggled a little with assemble_contigs(), especially understanding how to choose a starting node and what happens when there are multiple possible paths.
+
+One thing I liked was comparing different approaches to the same problem. I followed the recursive Eulerian walk from Langmead's lecture, while Graziano used an iterative approach with a stack. I also hadn't really thought about what happens when a graph branches and there isn't one clear path to follow. Initially, I was mainly thinking about connecting overlapping sequences, but looking at non-branching paths helped me understand why we can't always assume which direction a sequence should continue.
+
+Overall, I enjoyed this project. I still want to get more comfortable with recursion and understanding how different functions fit together, but I felt more confident with the underlying algorithm this time. I think this project helped me connect the coding side of bioinformatics with the actual biological problem we were trying to solve.
 
 # Generative AI Appendix
 As per the syllabus
