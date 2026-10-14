@@ -25,33 +25,50 @@ CLASS DeBruijnGraph
                 right = suffix of length k - 1
                 CALL add_edge(left, right)
 
-    FUNCTION eulerian_walk(start_node, graph, seed):
-        CREATE stack containing start_node
-        CREATE empty tour
-        WHILE stack is not empty:
-            current = last node in stack
-            IF current has unused outgoing edges:
-                SELECT an outgoing edge
-                REMOVE that edge from the graph
-                MOVE to the connected node
-                ADD connected node to stack
-            ELSE:
-                REMOVE current from stack
-                ADD current to tour
-        RETURN tour
+FUNCTION eulerian_walk(node, graph, seed=None):
+    IF seed is provided:
+        SET the random seed
+    CREATE tour containing node
+    SET current ← node
+    WHILE current exists in graph AND current has outgoing edges:
+        RANDOMLY SELECT one outgoing edge from current
+        SET next_node ← destination of selected edge
+        REMOVE the selected edge from graph[current]
+        IF graph[current] has no remaining outgoing edges:
+            REMOVE current from graph
+        APPEND next_node to tour
+        SET current ← next_node
+    RETURN tour
 
-    FUNCTION assemble_contigs(seed):
-        CREATE a working copy of the graph
-        CALCULATE incoming degree for each node
-        IDENTIFY likely Eulerian starting nodes
-        CREATE empty contigs list
-        WHILE unused graph regions remain:
-            SELECT a starting node
-            CALL eulerian_walk(start_node, working_graph)
-            REVERSE the returned tour
-            CALL tour_to_sequence(tour)
-            ADD assembled sequence to contigs
-        RETURN contigs
+FUNCTION assemble_contigs(seed=None):
+    IF seed is provided:
+        SET the random seed
+    CREATE work as a copy of the graph
+        COPY every node and its outgoing edges
+        INCLUDE only nodes that have outgoing edges
+    CREATE an empty dictionary called indegree
+    FOR each node in work:
+        FOR each destination node connected from node:
+            INCREASE indegree[destination] by 1
+    CREATE an empty list called start_nodes
+    CREATE an empty list called other_nodes
+    FOR each node in work:
+        SET outgoing_degree ← number of outgoing edges from node
+        SET incoming_degree ← indegree[node]
+        IF outgoing_degree > incoming_degree:
+            APPEND node to start_nodes
+        ELSE:
+            APPEND node to other_nodes
+    CREATE an empty list called contigs
+    CREATE ordered_nodes by combining:
+        start_nodes followed by other_nodes
+    FOR each start node in ordered_nodes:
+        WHILE start still exists in work:
+            SET tour ← eulerian_walk(start, work)
+            IF tour contains more than one node:
+                SET sequence ← tour_to_sequence(tour)
+                APPEND sequence to contigs
+    RETURN contigs
 
     FUNCTION tour_to_sequence(tour):
         IF tour is empty:
