@@ -106,12 +106,21 @@ WRITE_FASTA(contigs, file):
     FOR i, seq in contigs:
         write ">contig_i" and seq
 ```
+## Output 
+
+Please review the output files named genome_assembly_stats.txt and the FASTA file attached to the Github. 
+
 ## Successes
 
-There were major successes while working on this project. I would like to mention the first one as the scalability of the De Bruijn graph algorithm, running from a small toy dataset to more than 2.4. million yeast sequencing reads. Using the small dataset is the best approach to validate the code and the graph construction. 
-I also want to mentioned how the implementation of the program using Object Oriented Programming. Use class to separate responsibilities into methods for the graph construction was an improvement to the code. 
-The performance optimization is another point I want to bring. While running the code I called the Add_edge into the build_graph_from_reads function and notice that the code would run correct with the toy dataset, but once we scale it, we notice that the time that the code was running increased. So I removed the add_edge calling and added a conditional instatement inline to the function and that improved the code. 
-The statistics result was showing great results and that for sure was a improvement result from the first code we wrote that took a long time and did not provide a good result.
+There were major successes while working on this project. 
+
+*Scalability of the De Bruijn graph algorithm*: running from a small toy dataset to more than 2.4. million yeast sequencing reads. Using the small dataset is the best approach to validate the code and the graph construction. 
+
+*Implementation of the program using Object Oriented Programming*: Use class to separate responsibilities into methods for the graph construction was an improvement to the code. 
+
+*Performance optimization*: While running the code I called the Add_edge into the build_graph_from_reads function and notice that the code would run correct with the toy dataset, but once we scale it, we notice that the time that the code was running increased. So I removed the add_edge calling and added a conditional instatement inline to the function and that improved the code. 
+
+*Output Result*: We were successfully able to generate an output for the toy dataset as well as the yeast genome. 
 
 ## Struggles
 
