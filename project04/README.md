@@ -83,11 +83,21 @@ CLASS DeBruijnGraph
             WRITE contig sequence
         CLOSE file
 ```
+## Output 
+
+Please review the output files named genome_assembly_stats.txt and the FASTA file attached to the Github. 
+
 ## Successes
 
-There were major successes while working on this project. I would like to mention the first one as the scalability of the De Bruijn graph algorithm, running from a small toy dataset to more than 2.4. million yeast sequencing reads. Using the small dataset is the best approach to validate the code and the graph construction. 
-I also want to mentioned how the implementation of the program using Object Oriented Programming. Use class to separate responsibilities into methods for the graph construction was an improvement to the code. 
-The statistics result was showing great results and that for sure was a improvement result from the first code we wrote that took a long time and did not provide a good result.
+There were major successes while working on this project. 
+
+*Scalability of the De Bruijn graph algorithm*: running from a small toy dataset to more than 2.4. million yeast sequencing reads. Using the small dataset is the best approach to validate the code and the graph construction. 
+
+*Implementation of the program using Object Oriented Programming*: Use class to separate responsibilities into methods for the graph construction was an improvement to the code. 
+
+*Performance optimization*: While running the code I called the Add_edge into the build_graph_from_reads function and notice that the code would run correct with the toy dataset, but once we scale it, we notice that the time that the code was running increased. So I removed the add_edge calling and added a conditional instatement inline to the function and that improved the code. 
+
+*Output Result*: We were successfully able to generate an output for the toy dataset as well as the yeast genome. 
 
 ## Struggles
 
@@ -105,6 +115,10 @@ We would like to bring few challenges that we faced as we developed the code.
 ### Kailey Solorzano
 
 The overall project changed my logical thinking. I received a brief introduction to DeBruijn Graphs in BINF6310, but nothing as extensive as this course. The concept was difficult to learn at first (I had way too many tabs open), but after learning how to reconstruct it by hand provided the basis for my pseudocode. I started by using a sentence like "My cat is black" and would go through each step. This made the pseudocode easier to write and build the foundation to how I would write the code. 
+
+As we worked through the code, it was difficult to create certain functions because I knew what I wanted to do, but could not figure out how to create it. Learning about optimization sped up the timing of the code and created cleaner code. When collaborating together on Teams, we came to a consensus when we had similar or overlapping code. Aamna and I shared a lot of code and ideas. Graziano also came up with the idea of helper functions that would optimize the code; however we opted not to put them in because it would extended the run time in Pycharm. I think ideally these would be supplemental functions if we had additional time to perfect them and if I was using a different IDE. 
+
+For future projects, I believe I want to create a similar workflow as I think I am able to grasp the biological concept first, which facilitates how I should approach the code. Another thing to consider here is having patience for larger datasets. Larger datasets take more computational power and will take longer to produce an output. 
 
 ### Other members
 
