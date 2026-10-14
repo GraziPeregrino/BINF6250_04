@@ -1,7 +1,11 @@
 # Introduction
-A De Bruijn Graph visualizes the *de novo* genome assembly of short-read sequencing to construct longer consensus sequences (contigs). To construct the contigs, a Eulerian walk (path) is used to connect the nodes (prefixes and suffixs of the k-1 mer) with edges (the overlaps). 
+After short-read sequencing, the output is millions of short fragments (reads) of about 100-300 bp. To reconstruct the genome, we use de novo assembly because it does not require a reference genome. Comparing and reading each read against every other read to find overlaps is computationally long and difficult at this scale. The De Bruijn graphs can mitigate some of this overload by splitting each read into overlapping substrings of length k (k-mers).
 
-This project is broken down into three challenges: using toy/ sample data, using the yeast genome and attempting the mouse genome. In this code, we implement object-oriented programming by building ```class DeBruijn Graph``` to manipulate sequencing reads to conduct genome assembly by using Eulerian paths. 
+In a De Bruijn graph, each k-mer is a directed edge. Its first k−1 bases (the prefix) and last k−1 bases (the suffix) are the nodes it connects. Two k-mers that overlap by k−1 bases share a node, so overlaps between reads appear as connected edges. Assembly then becomes a path problem. A Eulerian path, which traverses every edge exactly once, uses every k-mer exactly once, and the sequence of nodes along it spells out a contig, a contiguous assembled sequence.
+
+This project implements that algorithm in Python using object-oriented programming. The ```class DeBruijnGraph``` stores the graph as an adjacent list, builds it from reads, performs the Eulerian walk, converts paths to sequences, and reports assembly statistics. We assume error-free reads, which removes the need for error correction. We take into account two features of real data: reads come from both DNA strands, so reverse-complement duplicate contigs must be removed, and repeats and coverage gaps mean no single Eulerian path exists, so contigs break at those points.
+
+The project has three stages of increasing scale: (1) a small toy example to verify correctness, (2) the S. cerevisiae (yeast) genome (~12 Mb, 2.4 million simulated 150 bp reads at 30× coverage), and (3) the mouse genome, which tests how the approach scales in time and memory. Assemblies are evaluated by number of contigs, total length, longest contig, and N50.
 
 ```text
 CLASS DeBruijnGraph
@@ -102,7 +106,7 @@ FUNCTION assemble_contigs(seed=None):
 ```
 ## Output 
 
-Please review the output files named genome_assembly_stats.txt and the FASTA file attached to the Github. 
+Please review the output files named genome_assembly_stats.txt.
 
 ## Successes
 
