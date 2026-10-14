@@ -4,107 +4,101 @@ A De Bruijn Graph visualizes the *de novo* genome assembly of short-read sequenc
 This project is broken down into three challenges: using toy/ sample data, using the yeast genome and attempting the mouse genome. In this code, we implement object-oriented programming by building ```class DeBruijn Graph``` to manipulate sequencing reads to conduct genome assembly by using Eulerian paths. 
 
 ```text
-# ---------- Setup ----------
+CLASS DeBruijnGraph
+    FUNCTION __init__(reads, k):
+        CREATE empty graph
+        STORE k-mer size
+        CALL build_graph_from_reads(reads, k)
 
-INIT(reads, k):
-    graph     = {}    # node -> outgoing neighbors
-    in_degree = {}    # node -> incoming edge count
-    BUILD_GRAPH(reads, k)
+    FUNCTION add_edge(left, right):
+        IF edge left → right does not already exist:
+            ADD right as an outgoing neighbor of left
 
-# ---------- Utilities ----------
+    FUNCTION remove_edge(left, right):
+        IF edge left → right exists:
+            REMOVE the edge
 
-REVERSE_COMPLEMENT(seq):
-    RETURN reverse(complement(seq))          # A<->T, C<->G
+    FUNCTION build_graph_from_reads(reads, k):
+        FOR each read:
+            FOR each k-mer in the read:
+                left  = prefix of length k - 1
+                right = suffix of length k - 1
+                CALL add_edge(left, right)
 
-CANONICAL(seq):
-    RETURN min(seq, REVERSE_COMPLEMENT(seq))
+FUNCTION eulerian_walk(node, graph, seed=None):
+    IF seed is provided:
+        SET the random seed
+    CREATE tour containing node
+    SET current ← node
+    WHILE current exists in graph AND current has outgoing edges:
+        RANDOMLY SELECT one outgoing edge from current
+        SET next_node ← destination of selected edge
+        REMOVE the selected edge from graph[current]
+        IF graph[current] has no remaining outgoing edges:
+            REMOVE current from graph
+        APPEND next_node to tour
+        SET current ← next_node
+    RETURN tour
 
-ONE_IN_ONE_OUT(node):
-    RETURN in_degree[node] == 1 AND |graph[node]| == 1
-
-PATH_TO_SEQUENCE(path):
-    RETURN path[0] + last base of each remaining node
-
-# ---------- Graph construction ----------
-
-ADD_EDGE(u, v):
-    IF v not in graph[u]:
-        add v to graph[u]
-        in_degree[v] += 1
-
-REMOVE_EDGE(u, v):
-    remove v from graph[u]
-    in_degree[v] -= 1
-    IF in_degree[v] == 0: delete in_degree[v]
-
-BUILD_GRAPH(reads, k):
-    FOR each read:
-        FOR each segment in split(read, "N"):
-            IF |segment| < k: CONTINUE
-            FOR each k-mer in segment:
-                ADD_EDGE(prefix(k-mer), suffix(k-mer))
-
-# ---------- Contig assembly ----------
-
-NON_BRANCHING_PATH(u, v, visited):
-    path = [u, v]
-    WHILE ONE_IN_ONE_OUT(v):
-        mark v visited
-        v = only neighbor of v
-        append v to path
-    RETURN path
-
-CYCLE(start, visited):
-    path = [start], node = start
-    REPEAT:
-        mark node visited
-        node = only neighbor of node
-        append node to path
-    UNTIL node == start
-    RETURN path
-
-ASSEMBLE_CONTIGS():
-    contigs, emitted, visited = [], {}, {}
-
-    FOR each node NOT ONE_IN_ONE_OUT:                 # non-branching paths
-        FOR each neighbor:
-            EMIT(NON_BRANCHING_PATH(node, neighbor, visited))
-
-    FOR each unvisited node that is ONE_IN_ONE_OUT:   # isolated cycles
-        EMIT(CYCLE(node, visited))
-
+FUNCTION assemble_contigs(seed=None):
+    IF seed is provided:
+        SET the random seed
+    CREATE work as a copy of the graph
+        COPY every node and its outgoing edges
+        INCLUDE only nodes that have outgoing edges
+    CREATE an empty dictionary called indegree
+    FOR each node in work:
+        FOR each destination node connected from node:
+            INCREASE indegree[destination] by 1
+    CREATE an empty list called start_nodes
+    CREATE an empty list called other_nodes
+    FOR each node in work:
+        SET outgoing_degree ← number of outgoing edges from node
+        SET incoming_degree ← indegree[node]
+        IF outgoing_degree > incoming_degree:
+            APPEND node to start_nodes
+        ELSE:
+            APPEND node to other_nodes
+    CREATE an empty list called contigs
+    CREATE ordered_nodes by combining:
+        start_nodes followed by other_nodes
+    FOR each start node in ordered_nodes:
+        WHILE start still exists in work:
+            SET tour ← eulerian_walk(start, work)
+            IF tour contains more than one node:
+                SET sequence ← tour_to_sequence(tour)
+                APPEND sequence to contigs
     RETURN contigs
 
-EMIT(path):
-    seq = PATH_TO_SEQUENCE(path)
-    IF CANONICAL(seq) not in emitted:
-        add CANONICAL(seq) to emitted
-        append seq to contigs
+    FUNCTION tour_to_sequence(tour):
+        IF tour is empty:
+            RETURN empty sequence
+        START sequence with the first (k - 1)-mer
+        FOR each remaining node:
+            APPEND the last nucleotide of the node
+        RETURN assembled sequence
 
-# ---------- Eulerian walk (Hierholzer) ----------
+    FUNCTION get_assembly_stats(contigs):
+        CALCULATE length of each contig
+        SORT lengths from longest to shortest
+        CALCULATE:
+            number of contigs
+            total assembly length
+            longest contig
+            shortest contig
+            mean contig length
+        CALCULATE N50:
+            ADD contig lengths from longest to shortest
+            STOP when cumulative length reaches half
+            of the total assembly length
+        RETURN assembly statistics
 
-EULERIAN_WALK(start, seed):
-    stack, tour = [start], []
-    WHILE stack:
-        u = top(stack)
-        IF graph[u] not empty:
-            v = random neighbor of u (seeded)
-            REMOVE_EDGE(u, v)
-            push v
-        ELSE:
-            pop u, append u to tour
-    RETURN reverse(tour)
-
-# ---------- Output ----------
-
-ASSEMBLY_STATS(contigs):
-    lengths = sorted lengths, descending
-    report count, total, max, min, mean
-    N50 = first length where running sum >= total / 2
-
-WRITE_FASTA(contigs, file):
-    FOR i, seq in contigs:
-        write ">contig_i" and seq
+    FUNCTION write_fasta(contigs, filename):
+        OPEN output FASTA file
+        FOR each contig:
+            WRITE contig header
+            WRITE contig sequence
+        CLOSE file
 ```
 ## Output 
 
@@ -124,9 +118,7 @@ There were major successes while working on this project.
 
 ## Struggles
 
-We would like to bring few challenges that we faced as we developed the code. 
-
-*```add_edge()``` function*: The code implementation was showing to add the ```Add_edge``` function which was great while working on the toy dataset, but once we increase the dataset the best approach was to add the inline edge insertion instead of calling ```add_edge```. 
+We would like to bring few challenges that we faced as we developed the code.  
 
 *Memory usage- an initial implementation stored forward and reverse graph*: Maintaining both adjacency structures required a large amount of memory. The final implementation stores the forward adjacency graph and only the incoming degree of each node, which contains the information required by the config assembly algorithm without storing every incoming adjacency list.
 
@@ -165,7 +157,7 @@ Overall, I enjoyed this project. I still want to get more comfortable with recur
 One of the biggest challenges while working on this project was the program runtime, the toy dataset and the yeast dataset helped me to understand that the scalability can be an issue overtime and it is always good to think how the code will support as the data increases. At first the code took up to 76 and the stats documentation was not correct as output. 
 
 `What I Learned`
-I learned about the performance problems on the code and how important it is to optimize the code to support the data increase. The graph construction was the main bottleneck. Repeatedly calling `add_edge()` innermost loop was significantly slower than performing the equivalent graph update directly. I also learned that replacing the complete reverse graph with an `in_degree` dictionary reduced the amount of information that needed to be stored and improved performance.
+I learned about the performance problems on the code and how important it is to optimize the code to support the data increase. The graph construction was the main bottleneck. Repeatedly calling `add_edge()` innermost loop was significantly slower than performing the equivalent graph update directly.
 
 `Next Steps`
 As next steps I would like to explore more memory efficient data structures, especially when working with larger genomes such as the mouse genome.
@@ -174,7 +166,7 @@ As next steps I would like to explore more memory efficient data structures, esp
 During development, my `assemble_contigs()` function became difficult to understand because it contained helper functions inside the main function and several different responsibilities were grouped together.
 
 `What I Learned`
-I learned how object-oriented programming can help separate a large algorithm into smaller methods with specific responsibilities. I moved operations such as checking whether a node is one-in/one-out, finding canonical DNA sequences, building non-branching paths, and handling cycles into private methods of the `DeBruijnGraph` class. I also learned how methods such as `@staticmethod` can be used when an operation belongs logically to a class but does not require information from a particular object. I also improved my understanding of object-oriented programming. Refactoring helper operations into private methods such as `_is_one_in_one_out()`, `_canonical_sequence()`, `_build_non_branching_path()`, and `_build_cycle()` made the class easier for me to understand and explain. 
+I learned how object-oriented programming can help separate a large algorithm into smaller methods with specific responsibilities. I moved operations such as checking whether a node is one-in/one-out, finding canonical DNA sequences, building non-branching paths, and handling cycles into private methods of the `DeBruijnGraph` class. I also learned how methods such as `@staticmethod` can be used when an operation belongs logically to a class but does not require information from a particular object. I also improved my understanding of object-oriented programming.
 
 `Next Steps`
 My next step is to continue learning how bioinformatics software represents very large graphs more efficiently and how production genome assemblers handle sequencing errors, repeated regions, and much larger genomes.
