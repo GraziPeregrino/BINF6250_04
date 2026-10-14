@@ -115,17 +115,39 @@ The statistics result was showing great results and that for sure was a improvem
 
 ## Struggles
 
-I want to bring few challenges that we faced as we developed the code. The code implementation was showing to add the Add_edge function which was great while working on the toy dataset, but once we increase the dataset the best approach was to add the inline edge insertion instead of calling the add_edge. 
-Another struggle we faced was the memory usage, an initial implementation stored forward and reverse graph. Maintaining both adjacency structures required a large amount of memory. The final implementation stores the forward adjacency graph and only the incoming degree of each node, which contains the information required by the config assembly algorithm without storing every incoming adjacency list.
-A third challenge was balancing the algorithm described in the assignment with the requirements of a large real dataset. The Eulerian walk works well for demonstrating the required graph-traversal algorithm and for validating small examples. For the complete yeast graph, the final implementation constructs maximal non-branching paths instead. This required understanding why a node with one incoming edge and one outgoing edge represents an unambiguous continuation of a `contig` and why branching nodes should terminate it.
+We would like to bring few challenges that we faced as we developed the code. 
 
+*```add_edge()``` function*: The code implementation was showing to add the ```Add_edge``` function which was great while working on the toy dataset, but once we increase the dataset the best approach was to add the inline edge insertion instead of calling ```add_edge```. 
+
+*Memory usage- an initial implementation stored forward and reverse graph*: Maintaining both adjacency structures required a large amount of memory. The final implementation stores the forward adjacency graph and only the incoming degree of each node, which contains the information required by the config assembly algorithm without storing every incoming adjacency list.
+
+*Balancing the algorithm described in the assignment with the requirements of a large real dataset*: The Eulerian walk works well for demonstrating the required graph-traversal algorithm and for validating small examples. For the complete yeast graph, the final implementation constructs maximal non-branching paths instead. This required understanding why a node with one incoming edge and one outgoing edge represents an unambiguous continuation of a `contig` and why branching nodes should terminate it.
+
+*Timing and Optimization*: An interesting challenge that came up throughout this project was the timing of the code within different IDEs. Using Pycharm on the Yeast genome took about an hour to complete; however, when using VSCode, the code took 5-8 minutes to complete. Optimization was a difficult task to complete as well. We tried our best to optimize the time, but with using different IDEs it became difficult to consider if the code is running at a faster time. We would love to get insight on this struggle and see if this happened to other groups as well. 
 
 ## Personal Reflections
 ### Group Leader
 
-Group leader's reflection on the project
+### Kailey Solorzano
 
-### Other member - Graziano Peregrino 
+The overall project changed my logical thinking. I received a brief introduction to DeBruijn Graphs in BINF6310, but nothing as extensive as this course. The concept was difficult to learn at first (I had way too many tabs open), but after learning how to reconstruct it by hand provided the basis for my pseudocode. I started by using a sentence like "My cat is black" and would go through each step. This made the pseudocode easier to write and build the foundation to how I would write the code. 
+
+### Other members
+
+### Aamna Sheikh
+
+I actually found this project a lot easier to understand conceptually than some of the previous ones, which is surprising because genome assembly in general is a pretty complicated process. Breaking sequencing reads into overlapping k-mers and using those overlaps to build a De Bruijn graph made sense to me. We discussed De Bruijn graphs earlier in the program too which helped because I had a biological application I was already somewhat familiar with so I understood what we were trying to do before getting into the code.
+
+I particularly liked working through the add_edge()/remove_edge() and build_graph_from_reads() functions. Once I understood how each k-mer was split into a prefix and suffix of length k-1, the graph construction clicked and was simple. The toy example helped a lot because I could actually follow how the reads were connected.
+
+The Eulerian walk was probably the most challenging part for me. I understood the idea of traversing every edge exactly once, but recursion took longer to figure out. I had to go through the code a few times to understand why we append nodes after visiting their outgoing edges and why the tour needs to be reversed. I also struggled a little with assemble_contigs(), especially understanding how to choose a starting node and what happens when there are multiple possible paths.
+
+One thing I liked was comparing different approaches to the same problem. I followed the recursive Eulerian walk from Langmead's lecture, while Graziano used an iterative approach with a stack. I also hadn't really thought about what happens when a graph branches and there isn't one clear path to follow. Initially, I was mainly thinking about connecting overlapping sequences, but looking at non-branching paths helped me understand why we can't always assume which direction a sequence should continue.
+
+Overall, I enjoyed this project. I still want to get more comfortable with recursion and understanding how different functions fit together, but I felt more confident with the underlying algorithm this time. I think this project helped me connect the coding side of bioinformatics with the actual biological problem we were trying to solve.
+
+### Graziano Peregrino 
+
 `Issue  - Performance and Scalability`
 One of the biggest challenges while working on this project was the program runtime, the toy dataset and the yeast dataset helped me to understand that the scalability can be an issue overtime and it is always good to think how the code will support as the data increases. At first the code took up to 76 and the stats documentation was not correct as output. 
 
@@ -145,8 +167,6 @@ I learned how object-oriented programming can help separate a large algorithm in
 My next step is to continue learning how bioinformatics software represents very large graphs more efficiently and how production genome assemblers handle sequencing errors, repeated regions, and much larger genomes.
 
 
-
-### Other members' reflections on the project
 ## Generative AI Appendix
 
 The appendix entry must contain:
